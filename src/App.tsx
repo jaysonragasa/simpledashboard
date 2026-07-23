@@ -82,13 +82,13 @@ function App() {
     useSensor(PointerSensor, {
       activationConstraint: {
         delay: 250,
-        tolerance: 5,
+        tolerance: 15,
       },
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
         delay: 250,
-        tolerance: 5,
+        tolerance: 15,
       },
     })
   );
