@@ -4,7 +4,7 @@ import { ClockTile } from './components/ClockTile';
 import { WeatherTile } from './components/WeatherTile';
 import { CalendarTile } from './components/CalendarTile';
 import { SortableTile } from './components/SortableTile';
-import { Image as ImageIcon, Settings, Palette } from 'lucide-react';
+import { Image as ImageIcon, Settings, Palette, Maximize, Minimize } from 'lucide-react';
 import { DndContext, closestCenter, TouchSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import type { DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
@@ -12,6 +12,27 @@ import { arrayMove, SortableContext, rectSortingStrategy } from '@dnd-kit/sortab
 function App() {
   const [theme, setTheme] = useState<'colored' | 'paper'>('colored');
   const [tiles, setTiles] = useState(['clock', 'weather', 'calendar', 'photos', 'theme', 'settings']);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(err => {
+        console.error(`Error attempting to enable fullscreen: ${err.message}`);
+      });
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+  };
 
   useEffect(() => {
     if (theme === 'paper') {
@@ -110,17 +131,42 @@ function App() {
   };
 
   return (
-    <DndContext 
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragEnd={handleDragEnd}
-    >
-      <SortableContext items={tiles} strategy={rectSortingStrategy}>
-        <div className="dashboard-grid">
-          {tiles.map(id => renderTile(id))}
-        </div>
-      </SortableContext>
-    </DndContext>
+    <>
+      <button 
+        onClick={toggleFullscreen}
+        style={{
+          position: 'fixed',
+          top: '20px',
+          right: '20px',
+          background: 'var(--tile-bg, rgba(255, 255, 255, 0.1))',
+          border: 'none',
+          color: 'var(--text-color)',
+          padding: '10px',
+          borderRadius: '50%',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          boxShadow: '0 2px 10px rgba(0,0,0,0.2)'
+        }}
+        title="Toggle Fullscreen"
+      >
+        {isFullscreen ? <Minimize size={24} /> : <Maximize size={24} />}
+      </button>
+
+      <DndContext 
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext items={tiles} strategy={rectSortingStrategy}>
+          <div className="dashboard-grid">
+            {tiles.map(id => renderTile(id))}
+          </div>
+        </SortableContext>
+      </DndContext>
+    </>
   );
 }
 
