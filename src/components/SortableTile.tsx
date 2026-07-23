@@ -22,7 +22,8 @@ export const SortableTile: React.FC<Props> = ({ id, size = 'normal', children })
     transform: CSS.Transform.toString(transform),
     transition,
     zIndex: isDragging ? 100 : 'auto',
-    position: 'relative' as const
+    position: 'relative' as const,
+    touchAction: 'pan-y'
   };
 
   const className = `sortable-wrapper ${size !== 'normal' ? size : ''}`;
