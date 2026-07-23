@@ -5,8 +5,8 @@ import { WeatherTile } from './components/WeatherTile';
 import { CalendarTile } from './components/CalendarTile';
 import { SortableTile } from './components/SortableTile';
 import { Image as ImageIcon, Settings, Palette, Maximize, Minimize } from 'lucide-react';
-import { DndContext, closestCenter, TouchSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import type { DragEndEvent } from '@dnd-kit/core';
+import { DndContext, closestCenter, TouchSensor, MouseSensor, useSensor, useSensors } from '@dnd-kit/core';
+import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
 
 function App() {
@@ -79,10 +79,9 @@ function App() {
   };
 
   const sensors = useSensors(
-    useSensor(PointerSensor, {
+    useSensor(MouseSensor, {
       activationConstraint: {
-        delay: 250,
-        tolerance: 15,
+        distance: 5, // 5px movement required to start dragging on desktop
       },
     }),
     useSensor(TouchSensor, {
