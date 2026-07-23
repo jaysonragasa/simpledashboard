@@ -10,9 +10,9 @@ import type { DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
 
 function App() {
-  const [theme, setTheme] = useState<'colored' | 'paper'>(() => {
+  const [theme, setTheme] = useState<'colored' | 'paper' | 'dark'>(() => {
     const saved = localStorage.getItem('dashboard-theme');
-    return (saved === 'paper' || saved === 'colored') ? saved : 'colored';
+    return (saved === 'paper' || saved === 'colored' || saved === 'dark') ? saved : 'colored';
   });
   
   const [tiles, setTiles] = useState<string[]>(() => {
@@ -64,15 +64,18 @@ function App() {
   };
 
   useEffect(() => {
-    if (theme === 'paper') {
-      document.body.classList.add('theme-paper');
-    } else {
-      document.body.classList.remove('theme-paper');
+    document.body.classList.remove('theme-paper', 'theme-dark');
+    if (theme !== 'colored') {
+      document.body.classList.add(`theme-${theme}`);
     }
   }, [theme]);
 
   const toggleTheme = () => {
-    setTheme(prev => prev === 'colored' ? 'paper' : 'colored');
+    setTheme(prev => {
+      if (prev === 'colored') return 'paper';
+      if (prev === 'paper') return 'dark';
+      return 'colored';
+    });
   };
 
   const sensors = useSensors(
@@ -138,7 +141,7 @@ function App() {
               <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
                 <Palette size={48} style={{ marginBottom: '10px' }} />
                 <div style={{ fontSize: '1rem', fontWeight: 600 }}>
-                  {theme === 'colored' ? 'Paper LCD' : 'Colored'}
+                  {theme === 'colored' ? 'Colored' : theme === 'paper' ? 'Paper LCD' : 'Dark Mode'}
                 </div>
               </div>
             </Tile>

@@ -24,6 +24,17 @@
   --tile-text-color: #555555;
 }
 
+.theme-dark {
+  --bg-color: #121212;
+  --text-color: #e0e0e0;
+  --tile-blue: #1c5b9f;
+  --tile-green: #007700;
+  --tile-orange: #a37514;
+  --tile-red: #aa0d0d;
+  --tile-purple: #1e3d6b;
+  --tile-text-color: #e0e0e0;
+}
+
 
 * {
   box-sizing: border-box;
