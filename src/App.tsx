@@ -6,7 +6,7 @@ import { CalendarTile } from './components/CalendarTile';
 import { SortableTile } from './components/SortableTile';
 import { Image as ImageIcon, Settings, Palette, Maximize, Minimize, Lightbulb, LightbulbOff } from 'lucide-react';
 import { DndContext, closestCenter, TouchSensor, MouseSensor, useSensor, useSensors } from '@dnd-kit/core';
-import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
+import type { DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
 
 function App() {
