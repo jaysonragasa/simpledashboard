@@ -10,8 +10,37 @@ import type { DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
 
 function App() {
-  const [theme, setTheme] = useState<'colored' | 'paper'>('colored');
-  const [tiles, setTiles] = useState(['clock', 'weather', 'calendar', 'photos', 'theme', 'settings']);
+  const [theme, setTheme] = useState<'colored' | 'paper'>(() => {
+    const saved = localStorage.getItem('dashboard-theme');
+    return (saved === 'paper' || saved === 'colored') ? saved : 'colored';
+  });
+  
+  const [tiles, setTiles] = useState<string[]>(() => {
+    const saved = localStorage.getItem('dashboard-tiles');
+    const defaultTiles = ['clock', 'weather', 'calendar', 'photos', 'theme', 'settings'];
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          // Keep only valid tiles and append any newly added tiles that aren't in the saved list
+          const validTiles = parsed.filter(t => defaultTiles.includes(t));
+          const missingTiles = defaultTiles.filter(t => !validTiles.includes(t));
+          return [...validTiles, ...missingTiles];
+        }
+      } catch (e) {
+        console.error('Failed to parse saved tiles', e);
+      }
+    }
+    return defaultTiles;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('dashboard-theme', theme);
+  }, [theme]);
+
+  useEffect(() => {
+    localStorage.setItem('dashboard-tiles', JSON.stringify(tiles));
+  }, [tiles]);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
