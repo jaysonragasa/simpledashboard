@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Tile } from './components/Tile';
 import { ClockTile } from './components/ClockTile';
 import { WeatherTile } from './components/WeatherTile';
 import { CalendarTile } from './components/CalendarTile';
 import { SortableTile } from './components/SortableTile';
-import { Image as ImageIcon, Settings, Palette, Maximize, Minimize } from 'lucide-react';
+import { Image as ImageIcon, Settings, Palette, Maximize, Minimize, Lightbulb, LightbulbOff } from 'lucide-react';
 import { DndContext, closestCenter, TouchSensor, MouseSensor, useSensor, useSensors } from '@dnd-kit/core';
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
@@ -42,6 +42,56 @@ function App() {
     localStorage.setItem('dashboard-tiles', JSON.stringify(tiles));
   }, [tiles]);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isAwake, setIsAwake] = useState(false);
+  const wakeLockRef = useRef<any>(null);
+
+  const toggleWakeLock = async () => {
+    if (!isAwake) {
+      try {
+        if ('wakeLock' in navigator) {
+          wakeLockRef.current = await (navigator as any).wakeLock.request('screen');
+          setIsAwake(true);
+          wakeLockRef.current.addEventListener('release', () => {
+            setIsAwake(false);
+            wakeLockRef.current = null;
+          });
+        } else {
+          alert('Keep Awake is not supported in this browser.');
+        }
+      } catch (err: any) {
+        console.error(`Wake Lock error: ${err.name}, ${err.message}`);
+        alert('Failed to activate Keep Awake.');
+      }
+    } else {
+      if (wakeLockRef.current) {
+        await wakeLockRef.current.release();
+        wakeLockRef.current = null;
+      }
+      setIsAwake(false);
+    }
+  };
+
+  useEffect(() => {
+    const handleVisibilityChange = async () => {
+      // Re-request wake lock when page becomes visible if it was previously awake
+      if (document.visibilityState === 'visible' && isAwake && wakeLockRef.current === null) {
+        try {
+          if ('wakeLock' in navigator) {
+            wakeLockRef.current = await (navigator as any).wakeLock.request('screen');
+            wakeLockRef.current.addEventListener('release', () => {
+              setIsAwake(false);
+              wakeLockRef.current = null;
+            });
+          }
+        } catch (err) {
+          setIsAwake(false);
+        }
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [isAwake]);
+
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -163,28 +213,45 @@ function App() {
 
   return (
     <>
-      <button 
-        onClick={toggleFullscreen}
-        style={{
-          position: 'fixed',
-          top: '20px',
-          right: '20px',
-          background: 'var(--tile-bg, rgba(255, 255, 255, 0.1))',
-          border: 'none',
-          color: 'var(--text-color)',
-          padding: '10px',
-          borderRadius: '50%',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000,
-          boxShadow: '0 2px 10px rgba(0,0,0,0.2)'
-        }}
-        title="Toggle Fullscreen"
-      >
-        {isFullscreen ? <Minimize size={24} /> : <Maximize size={24} />}
-      </button>
+      <div style={{ position: 'fixed', top: '20px', right: '20px', display: 'flex', gap: '10px', zIndex: 1000 }}>
+        <button 
+          onClick={toggleWakeLock}
+          style={{
+            background: 'var(--tile-bg, rgba(255, 255, 255, 0.1))',
+            border: 'none',
+            color: isAwake ? '#E3A21A' : 'var(--text-color)',
+            padding: '10px',
+            borderRadius: '50%',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 2px 10px rgba(0,0,0,0.2)'
+          }}
+          title={isAwake ? "Disable Keep Awake" : "Enable Keep Awake"}
+        >
+          {isAwake ? <Lightbulb size={24} /> : <LightbulbOff size={24} />}
+        </button>
+
+        <button 
+          onClick={toggleFullscreen}
+          style={{
+            background: 'var(--tile-bg, rgba(255, 255, 255, 0.1))',
+            border: 'none',
+            color: 'var(--text-color)',
+            padding: '10px',
+            borderRadius: '50%',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 2px 10px rgba(0,0,0,0.2)'
+          }}
+          title="Toggle Fullscreen"
+        >
+          {isFullscreen ? <Minimize size={24} /> : <Maximize size={24} />}
+        </button>
+      </div>
 
       <DndContext 
         sensors={sensors}
