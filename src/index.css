@@ -25,14 +25,14 @@
 }
 
 .theme-dark {
-  --bg-color: #121212;
-  --text-color: #e0e0e0;
-  --tile-blue: #1c5b9f;
-  --tile-green: #007700;
-  --tile-orange: #a37514;
-  --tile-red: #aa0d0d;
-  --tile-purple: #1e3d6b;
-  --tile-text-color: #e0e0e0;
+  --bg-color: #050505;
+  --text-color: #888888;
+  --tile-blue: #151515;
+  --tile-green: #151515;
+  --tile-orange: #151515;
+  --tile-red: #151515;
+  --tile-purple: #151515;
+  --tile-text-color: #888888;
 }
 
 
