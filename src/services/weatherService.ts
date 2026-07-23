@@ -112,8 +112,8 @@ export const getUserLocation = (): Promise<{lat: number, lon: number}> => {
           lon: position.coords.longitude
         });
       }, () => {
-        // Fallback to a default location (e.g., London) if user denies permission
-        resolve({ lat: 51.5074, lon: -0.1278 });
+        // Fallback to Manila, Philippines if user/device denies permission
+        resolve({ lat: 14.5995, lon: 120.9842 });
       });
     }
   });
