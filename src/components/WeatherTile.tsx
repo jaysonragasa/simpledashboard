@@ -147,13 +147,15 @@ export const WeatherTile: React.FC<WeatherTileProps> = ({ color = 'blue', size =
              <X size={24} />
            </button>
            
-           <div style={{ marginBottom: '20px' }}>
-              {getWeatherIcon(weather.current.weatherCode, 120, true)}
+           <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '20px' }}>
+              {getWeatherIcon(weather.current.weatherCode, 80, true)}
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                 <h1>{Math.round(weather.current.temperature)}°C</h1>
+                 <h2 style={{ margin: 0, opacity: 0.9 }}>{getWeatherDescription(weather.current.weatherCode)}</h2>
+              </div>
            </div>
            
-           <h1>{Math.round(weather.current.temperature)}°C</h1>
-           <h2>{getWeatherDescription(weather.current.weatherCode)}</h2>
-           
+
            <div className="forecast-5day">
              {[1, 2, 3, 4, 5].map((dayIndex) => (
                <div key={dayIndex} className="forecast-item">
@@ -166,6 +168,16 @@ export const WeatherTile: React.FC<WeatherTileProps> = ({ color = 'blue', size =
                   </div>
                </div>
              ))}
+           </div>
+
+           <div style={{ flex: 1, width: '100%', maxWidth: '800px', marginTop: '30px', borderRadius: '15px', overflow: 'hidden', boxShadow: '0 4px 15px rgba(0,0,0,0.3)' }}>
+             <iframe 
+               width="100%" 
+               height="100%" 
+               src={`https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=mm&metricTemp=%C2%B0C&metricWind=km/h&zoom=9&overlay=rain&product=ecmwf&level=surface&lat=${weather.lat}&lon=${weather.lon}`} 
+               frameBorder="0"
+               style={{ border: 0 }}
+             ></iframe>
            </div>
         </div>
       )}

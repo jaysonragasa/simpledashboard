@@ -11,6 +11,8 @@ export interface WeatherData {
     minTemp: number[];
   };
   locationName?: string;
+  lat: number;
+  lon: number;
 }
 
 const API_KEY = '680689d339e80c5abb0e156187e87d9c';
@@ -93,7 +95,9 @@ export const fetchWeatherData = async (lat: number, lon: number): Promise<Weathe
       maxTemp: dailyMaxTemps,
       minTemp: dailyMinTemps,
     },
-    locationName: currentData.name
+    locationName: currentData.name,
+    lat,
+    lon
   };
 };
 
